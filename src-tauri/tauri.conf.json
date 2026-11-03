@@ -45,9 +45,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEEwMzk4REQzMTk4NDlDN0MKUldSOG5JUVowNDA1b1BXa1o5dFFnWkdqWjdDSDhDNUFjSzVSaUsvLzgxbXdPeHV5cEE5R2lZcUMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMzRjVGNTdGNkE3NzZDQkMKUldTOGJIZHFmL1gxdy95M250UGl6UThKdzRHNkNpZmZ3dDRpRUhrb3lYTHRUR3VST0t0M1dWRmIK",
       "endpoints": [
-        "https://github.com/danielsvane/zmk-studio/releases/latest/download/latest.json"
+        "https://github.com/fingerrest/zmk-studio/releases/latest/download/latest.json"
       ],
       "windows": {
         "installMode": "passive"
