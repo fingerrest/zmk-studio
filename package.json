@@ -28,7 +28,7 @@
     "@tauri-apps/plugin-cli": "^2.0.0",
     "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-updater": "^2.10.1",
-    "@zmkfirmware/zmk-studio-ts-client": "file:../zmk-studio-ts-client",
+    "@zmkfirmware/zmk-studio-ts-client": "npm:@fingerrest/zmk-studio-ts-client@0.0.18-fingerrest.1",
     "emittery": "^1.0.3",
     "immer": "^10.1.1",
     "lucide-react": "^0.445.0",

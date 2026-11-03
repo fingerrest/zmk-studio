@@ -39,37 +39,17 @@ jobs:
         with:
           path: zmk-studio
 
-      # package.json takes the ts-client as `file:../zmk-studio-ts-client`, so it has
-      # to sit next to the checkout — hence both repos land in subdirectories. npm
-      # only symlinks that path, so the ts-client is built explicitly further down.
-      - uses: actions/checkout@v4
-        with:
-          repository: danielsvane/zmk-studio-ts-client
-          ref: customkeyboards
-          submodules: recursive
-          path: zmk-studio-ts-client
-
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-24.04' || matrix.platform == 'ubuntu-24.04-arm' # This must match the platform value defined above.
         run: |
           sudo apt-get update
           sudo apt-get install -y libappindicator3-dev librsvg2-dev libudev-dev patchelf \
-            protobuf-compiler \
             libwebkit2gtk-4.1-0=2.44.0-2 \
             libwebkit2gtk-4.1-dev=2.44.0-2 \
             libjavascriptcoregtk-4.1-0=2.44.0-2 \
             libjavascriptcoregtk-4.1-dev=2.44.0-2 \
             gir1.2-javascriptcoregtk-4.1=2.44.0-2 \
             gir1.2-webkit2-4.1=2.44.0-2
-
-      # protoc regenerates the ts-client's protobuf sources, which aren't committed.
-      - name: install protoc (macos only)
-        if: matrix.platform == 'macos-latest'
-        run: brew install protobuf
-
-      - name: install protoc (windows only)
-        if: matrix.platform == 'windows-latest'
-        run: choco install protoc -y
 
       - name: Get release
         id: get_release
@@ -96,7 +76,6 @@ jobs:
           cache: "npm" # Set this to npm, yarn or pnpm.
           cache-dependency-path: |
             zmk-studio/package-lock.json
-            zmk-studio-ts-client/package-lock.json
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
@@ -108,13 +87,6 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./zmk-studio/src-tauri -> target"
-
-      # Its postinstall regenerates the protobuf sources and compiles lib/, which the
-      # frontend's tsc step imports. Without this the build fails on unresolved
-      # `@zmkfirmware/zmk-studio-ts-client/*` imports.
-      - name: build ts-client
-        working-directory: zmk-studio-ts-client
-        run: npm install
 
       - name: install frontend dependencies
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.

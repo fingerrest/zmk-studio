@@ -1,6 +1,7 @@
+/// <reference types="vitest/config" />
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { defineConfig, searchForWorkspaceRoot } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
 const readJson = (rel: string) =>
@@ -36,18 +37,15 @@ export default defineConfig({
   // Tauri expects a fixed port, fail if that port is not available
   server: {
     strictPort: true,
-    fs: {
-      // `@zmkfirmware/zmk-studio-ts-client` is a `file:` dependency, so
-      // node_modules holds a symlink to a sibling checkout and every module
-      // Vite serves from it resolves to a real path outside this project. The
-      // dev server refuses those by default ("The request id … is outside of
-      // Vite serving allow list") and the import fails at runtime — the RPC
-      // client and its transports simply don't load. Keep the default root and
-      // add the sibling.
-      allow: [
-        searchForWorkspaceRoot(process.cwd()),
-        fileURLToPath(new URL("../zmk-studio-ts-client", import.meta.url)),
-      ],
+  },
+  test: {
+    server: {
+      deps: {
+        // The ts-client's lib/ imports `protobufjs/minimal` without an extension.
+        // Bundlers resolve that, but Node's ESM loader doesn't, and Vitest hands
+        // packages in node_modules to Node by default. Run it through Vite instead.
+        inline: ["@zmkfirmware/zmk-studio-ts-client"],
+      },
     },
   },
   // to access the Tauri environment variables set by the CLI with information about the current target
