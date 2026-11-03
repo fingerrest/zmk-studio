@@ -34,8 +34,7 @@ import {
 
 import { LayerPicker } from "./LayerPicker";
 import { LayerToolbar } from "./LayerToolbar";
-// Layout picker temporarily hidden — not needed for now.
-// import { PhysicalLayoutPicker } from "./PhysicalLayoutPicker";
+import { PhysicalLayoutPicker } from "./PhysicalLayoutPicker";
 import { Keymap as KeymapComp } from "./Keymap";
 import { ComboList } from "./ComboList";
 import { ComboEditor } from "../combos/ComboEditor";
@@ -203,7 +202,7 @@ export default function Keyboard({ page }: { page: Page }) {
     layouts,
     ,
     selectedPhysicalLayoutIndex,
-    // setSelectedPhysicalLayoutIndex — unused while layout picker is hidden
+    setSelectedPhysicalLayoutIndex,
   ] = useLayouts();
   const [keymap, setKeymap] = useConnectedDeviceData<Keymap>(
     { keymap: { getKeymap: true } },
@@ -293,20 +292,19 @@ export default function Keyboard({ page }: { page: Page }) {
     performSetRequest();
   }, [selectedPhysicalLayoutIndex, setKeymap]);
 
-  // Layout picker temporarily hidden — see commented PhysicalLayoutPicker below.
-  // const doSelectPhysicalLayout = useCallback(
-  //   (i: number) => {
-  //     const oldLayout = selectedPhysicalLayoutIndex;
-  //     undoRedo?.(async () => {
-  //       setSelectedPhysicalLayoutIndex(i);
-  //
-  //       return async () => {
-  //         setSelectedPhysicalLayoutIndex(oldLayout);
-  //       };
-  //     });
-  //   },
-  //   [undoRedo, selectedPhysicalLayoutIndex, setSelectedPhysicalLayoutIndex]
-  // );
+  const doSelectPhysicalLayout = useCallback(
+    (i: number) => {
+      const oldLayout = selectedPhysicalLayoutIndex;
+      undoRedo?.(async () => {
+        setSelectedPhysicalLayoutIndex(i);
+
+        return async () => {
+          setSelectedPhysicalLayoutIndex(oldLayout);
+        };
+      });
+    },
+    [undoRedo, selectedPhysicalLayoutIndex, setSelectedPhysicalLayoutIndex]
+  );
 
   // Clicking the selected key again clears the selection and closes the binding
   // drawer, the same toggle the combo key-position picker uses.
@@ -1255,7 +1253,6 @@ export default function Keyboard({ page }: { page: Page }) {
   return (
     <div className="grid grid-cols-[auto_1fr] grid-rows-[minmax(0,1fr)_min(54vh,28rem)] bg-base-300 max-w-full min-w-0 min-h-0">
       <div className={`${SIDEBAR_REGION} row-span-2`}>
-        {/* Layout picker temporarily hidden — not needed for now.
         {layouts && (
           <PhysicalLayoutPicker
             layouts={layouts}
@@ -1263,7 +1260,14 @@ export default function Keyboard({ page }: { page: Page }) {
             onPhysicalLayoutClicked={doSelectPhysicalLayout}
           />
         )}
-        */}
+        {/* The firmware remaps keymap bindings through the layout position map,
+            but combos keep raw key positions (zmkfirmware/zmk#3228). */}
+        {layouts && layouts.length > 1 && (combos?.combos.length ?? 0) > 0 && (
+          <p className="ml-2 mt-1 max-w-56 text-xs text-base-content/60">
+            Combos aren't remapped when you switch layouts. Check their keys
+            afterwards.
+          </p>
+        )}
 
         {keymap && (
           <LayerPicker
